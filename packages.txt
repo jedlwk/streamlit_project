@@ -1,5 +1,0 @@
-contractions-dev
-nltk-dev
-pandas-dev
-plotly-dev
-beautifulsoup4-dev

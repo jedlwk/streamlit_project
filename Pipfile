@@ -4,8 +4,18 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+contractions = "==0.1.73"
+nltk = "==3.8.1"
+pandas = "==2.0.0"
+plotly = "==5.14.1"
+beautifulsoup4 = "==4.12.2"
 
 [dev-packages]
+contractions-dev = "*"
+nltk-dev = "*"
+pandas-dev = "*"
+plotly-dev = "*"
+beautifulsoup4-dev = "*"
 
 [requires]
 python_version = "3.10"
