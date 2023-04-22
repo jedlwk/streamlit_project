@@ -1,0 +1,5 @@
+contractions
+nltk
+pandas
+plotly
+beautifulsoup4
