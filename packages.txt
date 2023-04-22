@@ -1,0 +1,6 @@
+bs4-dev
+BeautifulSoup-dev
+pandas-dev
+nltk-dev
+contractions-dev
+streamlit-dev
