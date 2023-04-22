@@ -1,18 +1,18 @@
 import contractions
-from nltk.corpus.reader import WordNetCorpusReader
-from nltk.stem import WordNetLemmatizer
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-import streamlit as st
 import re
 import string
 from typing import List, Tuple
 
 import pandas as pd
 import plotly.graph_objs as go
-from bs4 import BeautifulSoup
+import streamlit as st
 
-import nltk
+from bs4 import BeautifulSoup
+from nltk.corpus import stopwords, wordnet
+from nltk.stem import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
+
+
 nltk.download('wordnet')
 
 
