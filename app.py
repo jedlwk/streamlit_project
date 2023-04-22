@@ -1,6 +1,7 @@
 import contractions
 import re
 import string
+import nltk
 from typing import List, Tuple
 
 import pandas as pd
