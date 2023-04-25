@@ -18,39 +18,40 @@ nltk.download('wordnet')
 
 
 # Define words lists
-female_words_light = ['affectionate', 'agree', 'cheer', 'child',
-                      'collaborate', 'collaboration',
-                      'collaborative', 'collaboratively', 'community', 'compassion',
-                      'compassionate', 'connect', 'considerate', 'cooperate',
-                      'cooperation', 'cooperative', 'depend', 'dependable', 'emotional',
-                      'empathetic', 'empathy', 'enthusiasm', 'enthusiast',
-                      'enthusiastic', 'feel', 'flatterable', 'gentle',
-                      'honest', 'inclusive']
-female_words_medium = ['interdependent', 'interpersonal', 'intimate', 'kind',
-                       'kinship', 'loyal', 'modest', 'modesty', 'nag', 'nurture',
-                       'nurturing', 'patience', 'patient', 'pleasant', 'polite',
-                       'quiet', 'sensitive', 'share', 'sharing', 'submissive',
-                       'supportive', 'sympathetic', 'sympathy', 'tender',
-                       'together', 'warm', 'whine', 'yield']
-female_words_strong = ['female', 'females', 'woman', 'women',
-                       'she', 'her', 'hers', 'maternity', 'ms', 'mrs', 'miss']
+female_explicit_biased_words = ['female', 'females', 'woman', 'women', 'she',
+                                'her', 'hers', 'maternity', 'mrs', 'miss']
 
-male_words_light = ['active', 'adventurous', 'aggressive', 'ambitious', 'assert',
-                    'assertive', 'athletic', 'autonomous', 'autonomy', 'battle',
-                    'boast', 'challenge', 'champion', 'compete', 'competitive',
-                    'confident', 'courage', 'courageous', 'decision', 'decisive',
-                    'defend', 'defensive', 'determine', 'direct', 'dominant',
-                    'dominate', 'drive', 'driven', 'expert', 'fearless', 'fight',
-                    'force', 'greedy', 'head-strong']
-male_words_medium = ['headstrong', 'hierarchy',
-                     'hostile', 'impulsive', 'independent', 'individual',
-                     'independently', 'individually',
-                     'intellect', 'lead', 'leader', 'logic', 'objective',
-                     'opinion', 'outspoken', 'persist', 'principle', 'proactive', 'reckless',
-                     'selfconfident', 'selfreliant', 'selfsufficient', 'strong',
-                     'stubborn', 'superior', 'tackle', 'unreasonable']
-male_words_strong = ['male', 'males', 'man',
-                     'men', 'he', 'him', 'his', 'paternity', 'mr']
+weakly_feminine_words = ['affectionate', 'approachable', 'attune', 'calming',
+                         'cheer', 'collaborate', 'collaboratively', 'connect',
+                         'cooperate', 'cooperation', 'cooperative', 'dedicated',
+                         'dependable', 'diplomatic', 'expressive', 'heartfelt',
+                         'inclusive', 'interdependent', 'interpersonal', 'listening',
+                         'loyal', 'maternity', 'mediating', 'mindful', 'modest',
+                         'organized']
+
+strongly_feminine_words = ['attentive', 'caring', 'collaborative', 'community',
+                           'compassion', 'compassionate', 'considerate', 'creative',
+                           'emotional', 'empathetic', 'empathy', 'encouraging',
+                           'enthusiastic', 'friendly', 'gentle', 'harmonious',
+                           'helpful', 'honest', 'humble', 'inspiring', 'kind',
+                           'nurturing', 'patient', 'supportive']
+
+male_explicit_biased_words = ['male', 'males', 'man', 'men', 'he',
+                              'him', 'his', 'paternity', 'mr']
+
+weakly_masculine_words = ['assertive', 'athletic', 'authoritative', 'autonomy',
+                          'autonomous', 'battle', 'boast', 'commanding', 'courageous',
+                          'defensive', 'determine', 'enterprising', 'exceed',
+                          'exceptional', 'grit', 'headstrong', 'hierarchical',
+                          'individually', 'industrious', 'logical', 'masterful',
+                          'motivate', 'negotiate', 'outgoing', 'outspoken',
+                          'resilient', 'strategic']
+
+strongly_masculine_words = ['aggressive', 'ambitious', 'bold', 'challenge', 'competitive',
+                            'confident', 'decisive', 'defend', 'direct', 'dominant',
+                            'disciplined', 'driven', 'energetic', 'fight', 'force',
+                            'focused', 'independent', 'influential', 'lead', 'powerful',
+                            'resolve', 'robust', 'strong']
 
 # Data preprocessing for strong word lists
 
@@ -59,6 +60,12 @@ def basic_text_cleaning(text):
     # Remove any HTML tags that might be present
     text = BeautifulSoup(text, "html.parser").get_text()
 
+    # Remove URLs
+    text = re.sub(r'http\S+|www\S+|https\S+', '', text, flags=re.MULTILINE)
+
+    # Remove Emojis
+    text = text.encode('ascii', 'ignore').decode('ascii')
+
     # Add a space between words without spaces, except for all-uppercase words
     # Examples: ResponsibilitiesYour, ResponsibilitiesDuties
     text = re.sub(r'(?<=[a-z])(?=[A-Z])', ' ', text)
@@ -66,18 +73,11 @@ def basic_text_cleaning(text):
     # Convert text to lowercase
     text = text.lower()
 
-    # Remove URLs
-    text = re.sub(r'http\S+|www\S+|https\S+', '', text, flags=re.MULTILINE)
+    # Replace punctuation with a space
+    text = re.sub(r'['+string.punctuation+']', ' ', text)
 
-    # Remove Emojis
-    text = text.encode('ascii', 'ignore').decode('ascii')
-
-    # Expand Contractions (convert "can't" to "cannot")
-    text = contractions.fix(text)
-
-    # Remove Punctuation
-    # "self-confident,!" = "selfconfident"
-    text = text.translate(str.maketrans('', '', string.punctuation))
+    # Remove extra spaces
+    text = re.sub(r'\s+', ' ', text).strip()
 
     return text
 
@@ -95,65 +95,73 @@ def create_dataframe(text: str) -> pd.DataFrame:
     words = re.findall(r'\S+|\n', text)
     lemmatizer = WordNetLemmatizer()
     data = {'original_word': words,
-            'cleaned_word_strong': [basic_text_cleaning(word) for word in words],
-            'cleaned_word_medium_light': [lemmatizer.lemmatize(basic_text_cleaning(word)) for word in words]}
+            'cleaned_word': [basic_text_cleaning(word) for word in words],
+            'further_cleaned_word': [lemmatizer.lemmatize(basic_text_cleaning(word)) for word in words]}
     return pd.DataFrame(data)
 
 
-def highlight_words(df: pd.DataFrame, female_words: List[List[str]], male_words: List[List[str]]) -> str:
+def highlight_words(df: pd.DataFrame, female_explicit_biased_words: List[str], male_explicit_biased_words: List[str],
+                   strongly_feminine_words: List[str], strongly_masculine_words: List[str],
+                   weakly_feminine_words: List[str], weakly_masculine_words: List[str]) -> str:
     """
-    Highlights gendered terms in a DataFrame of preprocessed words based on their gender bias score.
+    Highlights gendered terms in the input text with different colors based on their gendered strength.
 
     Parameters:
-        df (pd.DataFrame): A DataFrame of preprocessed words with columns 'original_word', 'cleaned_word_strong', 'cleaned_word_medium_light', and 'cleaned_word_medium_light'.
-        female_words (List[List[str]]): A list of female gendered terms divided into three levels of strength.
-        male_words (List[List[str]]): A list of male gendered terms divided into three levels of strength.
+        df (pd.DataFrame): A DataFrame of preprocessed words with columns 'original_word', 'cleaned_word', and 'further_cleaned_word'.
+        female_explicit_biased_words (List[str]): A list of explicitly biased female terms.
+        male_explicit_biased_words (List[str]): A list of explicitly biased male terms.
+        strongly_feminine_words (List[str]): A list of strongly gendered female terms.
+        strongly_masculine_words (List[str]): A list of strongly gendered male terms.
+        weakly_feminine_words (List[str]): A list of weakly gendered female terms.
+        weakly_masculine_words (List[str]): A list of weakly gendered male terms.
 
     Returns:
-        str: A string of words with gendered terms highlighted using HTML tags.
+        str: The input text with gendered terms highlighted using different colors.
     """
     highlighted_text = []
-
     for _, row in df.iterrows():
         original_word = row['original_word']
-        cleaned_word_strong = row['cleaned_word_strong']
-        cleaned_word_medium = row['cleaned_word_medium_light']
-        cleaned_word_light = row['cleaned_word_medium_light']
+        cleaned_word = row['cleaned_word']
+        further_cleaned_word = row['further_cleaned_word']
 
         if original_word == "\n":
             highlighted_text.append("<br>")
-        elif cleaned_word_strong in female_words[2]:
+        elif cleaned_word in female_explicit_biased_words:
             highlighted_text.append(
                 f'<mark style="background-color: #FF4040;">{original_word}</mark>')
-        elif cleaned_word_strong in male_words[2]:
+        elif cleaned_word in male_explicit_biased_words:
             highlighted_text.append(
                 f'<mark style="background-color: #4040FF;">{original_word}</mark>')
-        elif cleaned_word_medium in female_words[1]:
+        elif further_cleaned_word in strongly_feminine_words:
             highlighted_text.append(
-                f'<mark style="background-color: #FF8080;">{original_word}</mark>')
-        elif cleaned_word_medium in male_words[1]:
+                f'<mark style="background-color: #FFA0A0;">{original_word}</mark>')
+        elif further_cleaned_word in strongly_masculine_words:
             highlighted_text.append(
-                f'<mark style="background-color: #8080FF;">{original_word}</mark>')
-        elif cleaned_word_light in female_words[0]:
+                f'<mark style="background-color: #A0A0FF;">{original_word}</mark>')
+        elif further_cleaned_word in weakly_feminine_words:
             highlighted_text.append(
-                f'<mark style="background-color: #FFC0C0;">{original_word}</mark>')
-        elif cleaned_word_light in male_words[0]:
+                f'<mark style="background-color: #FFD0D0;">{original_word}</mark>')
+        elif further_cleaned_word in weakly_masculine_words:
             highlighted_text.append(
-                f'<mark style="background-color: #C0C0FF;">{original_word}</mark>')
+                f'<mark style="background-color: #D0D0FF;">{original_word}</mark>')
         else:
             highlighted_text.append(original_word)
 
     return ' '.join(highlighted_text)
 
 
-def gender_bias_score(df: pd.DataFrame, female_words: List[List[str]], male_words: List[List[str]]) -> Tuple[int, int]:
+
+def gender_bias_score(df: pd.DataFrame, strongly_feminine_words: List[str], strongly_masculine_words: List[str],
+                      weakly_feminine_words: List[str], weakly_masculine_words: List[str]) -> Tuple[int, int]:
     """
     Calculates the gender bias scores for female and male terms based on a DataFrame of preprocessed words.
 
     Parameters:
-        df (pd.DataFrame): A DataFrame of preprocessed words with columns 'cleaned_word_strong', 'cleaned_word_medium_light', and 'cleaned_word_medium_light'.
-        female_words (List[List[str]]): A list of female gendered terms divided into three levels of strength.
-        male_words (List[List[str]]): A list of male gendered terms divided into three levels of strength.
+        df (pd.DataFrame): A DataFrame of preprocessed words with columns 'further_cleaned_word'.
+        strongly_feminine_words (List[str]): A list of female gendered terms with a score of 2.
+        strongly_masculine_words (List[str]): A list of male gendered terms with a score of 2.
+        weakly_feminine_words (List[str]): A list of female gendered terms with a score of 1.
+        weakly_masculine_words (List[str]): A list of male gendered terms with a score of 1.
 
     Returns:
         Tuple[int, int]: A tuple containing the gender bias scores for female and male terms, respectively.
@@ -162,21 +170,15 @@ def gender_bias_score(df: pd.DataFrame, female_words: List[List[str]], male_word
     male_score = 0
 
     for _, row in df.iterrows():
-        cleaned_word_strong = row['cleaned_word_strong']
-        cleaned_word_medium = row['cleaned_word_medium_light']
-        cleaned_word_light = row['cleaned_word_medium_light']
+        further_cleaned_word = row['further_cleaned_word']
 
-        if cleaned_word_strong in female_words[2]:
-            female_score += 5
-        elif cleaned_word_strong in male_words[2]:
-            male_score += 5
-        elif cleaned_word_medium in female_words[1]:
+        if further_cleaned_word in strongly_feminine_words:
             female_score += 2
-        elif cleaned_word_medium in male_words[1]:
+        elif further_cleaned_word in strongly_masculine_words:
             male_score += 2
-        elif cleaned_word_light in female_words[0]:
+        elif further_cleaned_word in weakly_feminine_words:
             female_score += 1
-        elif cleaned_word_light in male_words[0]:
+        elif further_cleaned_word in weakly_masculine_words:
             male_score += 1
 
     return female_score, male_score
@@ -252,7 +254,7 @@ def plot_gender_bias_meter(female_score: int, male_score: int, gauge_number_colo
 
 
 # Set the title of the Streamlit app
-st.title("Gender Bias Analyzer")
+st.title("Gender Bias Text Analyzer")
 
 # Increase the font size of the input label using markdown
 st.markdown(
@@ -293,15 +295,49 @@ if submit_button:
         df = create_dataframe(input_text)
 
         # Call gender_bias_score function to calculate the gender bias scores for female and male terms
-        female_score, male_score = gender_bias_score(df, [female_words_light, female_words_medium, female_words_strong], [
-                                                     male_words_light, male_words_medium, male_words_strong])
+        female_score, male_score = gender_bias_score(
+            df,
+            strongly_feminine_words, strongly_masculine_words,
+            weakly_feminine_words, weakly_masculine_words
+        )
 
         # Call plot_gender_bias_meter function to create Plotly gauge charts for the gender bias scores
         female_gauge_chart, male_gauge_chart = plot_gender_bias_meter(
             female_score, male_score, 'black')
 
+        explicit_bias_detected = any(word in df['cleaned_word'].tolist() for word in female_explicit_biased_words + male_explicit_biased_words)
+
+        # Define a custom CSS style for the bias message box
+        st.markdown("""
+        <style>
+            .bias_message_box {
+                background-color: rgba(240, 240, 240, 1);
+                padding: 8px 12px;
+                font-size: 22px;
+                text-align: center;
+                margin-top: 0px;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+            }
+            .bias_message_box.bias_message_box_male {
+                background-color: rgba(192, 192, 255, 0.3);
+            }
+            .bias_message_box.bias_message_box_female {
+                background-color: rgba(255, 192, 192, 0.3);
+            }
+        </style>
+        """, unsafe_allow_html=True)
+
+        if explicit_bias_detected:
+            st.markdown('<style>h3 {margin-top: 50px !important;}</style>', unsafe_allow_html=True)
+            st.markdown('<p style="text-align: center; color: darkred; font-size: 30px; font-weight: bold;">Explicit Bias Detected!</p>', unsafe_allow_html=True)
+
         # Display the gender bias meter and the analyzed text
         st.markdown("### Gender Bias Meter", unsafe_allow_html=True)
+
         st.markdown(
             '<style>h3 {margin-bottom: -50px !important;}</style>', unsafe_allow_html=True)
         col1, col2 = st.columns(2)
@@ -309,13 +345,40 @@ if submit_button:
             st.plotly_chart(male_gauge_chart)
         with col2:
             st.plotly_chart(female_gauge_chart)
+
+        score_diff = male_score - female_score
+        if any(word in df['cleaned_word'].tolist() for word in male_explicit_biased_words):
+            bias_message_box_class = "bias_message_box bias_message_box_male"
+            bias_message = "Job Description is <b>explicitly</b> biased towards Male Candidates"
+        elif any(word in df['cleaned_word'].tolist() for word in female_explicit_biased_words):
+            bias_message_box_class = "bias_message_box bias_message_box_female"
+            bias_message = "Job Description is <b>explicitly</b> biased towards Female Candidates"
+        elif abs(score_diff) < 5:
+            bias_message_box_class = "bias_message_box"
+            bias_message = "Job Description is Gender Neutral"
+        elif 5 <= abs(score_diff) <= 10:
+            bias_message_box_class = "bias_message_box"
+            bias_message = f"Job Description is <b>slightly</b> biased towards {'Male' if score_diff > 0 else 'Female'} Candidates"
+        elif 10 < abs(score_diff) <= 20:
+            bias_message_box_class = "bias_message_box"
+            bias_message = f"Job Description is <b>more</b> biased towards {'Male' if score_diff > 0 else 'Female'} Candidates"
+        else:
+            bias_message_box_class = "bias_message_box"
+            bias_message = f"Job Description is <b>extremely</b> biased towards {'Male' if score_diff > 0 else 'Female'} Candidates"
+
+        st.markdown(f'<div class="{bias_message_box_class}"><span>{bias_message}</span></div>', unsafe_allow_html=True)
+
         st.markdown("### Analyzed Text", unsafe_allow_html=True)
         st.markdown(
             '<style>h3 {margin-top: 10px !important;}</style>', unsafe_allow_html=True)
 
         # Call highlight_words function to highlight gendered terms in the analyzed text
-        highlighted_text = highlight_words(df, [female_words_light, female_words_medium, female_words_strong], [
-                                           male_words_light, male_words_medium, male_words_strong])
+        highlighted_text = highlight_words(
+            df,
+            female_explicit_biased_words, male_explicit_biased_words,
+            strongly_feminine_words, strongly_masculine_words,
+            weakly_feminine_words, weakly_masculine_words
+        )
         st.markdown(
             '<style>h3 {margin-top: 10px !important;}</style>', unsafe_allow_html=True)
 
