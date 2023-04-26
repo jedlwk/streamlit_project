@@ -368,7 +368,7 @@ if submit_button:
 
         st.markdown(f'<div class="{bias_message_box_class}"><span>{bias_message}</span></div>', unsafe_allow_html=True)
 
-        st.markdown("### Analyzed Text", unsafe_allow_html=True)
+        st.markdown("### Analyzed Job Description", unsafe_allow_html=True)
         st.markdown(
             '<style>h3 {margin-top: 10px !important;}</style>', unsafe_allow_html=True)
 
@@ -384,4 +384,4 @@ if submit_button:
 
         # Display the highlighted text in a styled box
         st.markdown(
-            f'<div style="background-color: white; padding: 10px; border: 1px solid #ccc; white-space: pre-wrap;">{highlighted_text}</div>', unsafe_allow_html=True)
+            f'<div style="background-color: #f5f5f5; padding: 20px; border: 1px solid #ccc; white-space: pre-wrap; border-radius: 10px; line-height: 1.6;">{highlighted_text}</div>', unsafe_allow_html=True)
