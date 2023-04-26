@@ -1,18 +1,17 @@
 import contractions
 import re
 import string
-import nltk
-from typing import List, Tuple
 
+from typing import List, Tuple
 import pandas as pd
 import plotly.graph_objs as go
 import streamlit as st
 
+import nltk
 from bs4 import BeautifulSoup
 from nltk.corpus import stopwords, wordnet
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
-
 
 nltk.download('wordnet')
 
@@ -101,8 +100,8 @@ def create_dataframe(text: str) -> pd.DataFrame:
 
 
 def highlight_words(df: pd.DataFrame, female_explicit_biased_words: List[str], male_explicit_biased_words: List[str],
-                   strongly_feminine_words: List[str], strongly_masculine_words: List[str],
-                   weakly_feminine_words: List[str], weakly_masculine_words: List[str]) -> str:
+                    strongly_feminine_words: List[str], strongly_masculine_words: List[str],
+                    weakly_feminine_words: List[str], weakly_masculine_words: List[str]) -> str:
     """
     Highlights gendered terms in the input text with different colors based on their gendered strength.
 
@@ -148,7 +147,6 @@ def highlight_words(df: pd.DataFrame, female_explicit_biased_words: List[str], m
             highlighted_text.append(original_word)
 
     return ' '.join(highlighted_text)
-
 
 
 def gender_bias_score(df: pd.DataFrame, strongly_feminine_words: List[str], strongly_masculine_words: List[str],
@@ -305,7 +303,8 @@ if submit_button:
         female_gauge_chart, male_gauge_chart = plot_gender_bias_meter(
             female_score, male_score, 'black')
 
-        explicit_bias_detected = any(word in df['cleaned_word'].tolist() for word in female_explicit_biased_words + male_explicit_biased_words)
+        explicit_bias_detected = any(word in df['cleaned_word'].tolist(
+        ) for word in female_explicit_biased_words + male_explicit_biased_words)
 
         # Define a custom CSS style for the bias message box
         st.markdown("""
@@ -331,13 +330,17 @@ if submit_button:
         </style>
         """, unsafe_allow_html=True)
 
+        # Check if explicit bias is detected and display a message if so
         if explicit_bias_detected:
-            st.markdown('<style>h3 {margin-top: 50px !important;}</style>', unsafe_allow_html=True)
-            st.markdown('<p style="text-align: center; color: darkred; font-size: 30px; font-weight: bold;">Explicit Bias Detected!</p>', unsafe_allow_html=True)
+            st.markdown(
+                '<style>h3 {margin-top: 50px !important;}</style>', unsafe_allow_html=True)
+            st.markdown(
+                '<p style="text-align: center; color: darkred; font-size: 30px; font-weight: bold;">Explicit Bias Detected!</p>', unsafe_allow_html=True)
 
         # Display the gender bias meter and the analyzed text
         st.markdown("### Gender Bias Meter", unsafe_allow_html=True)
 
+        # Style the gender bias meter to appear alongside the analyzed text
         st.markdown(
             '<style>h3 {margin-bottom: -50px !important;}</style>', unsafe_allow_html=True)
         col1, col2 = st.columns(2)
@@ -346,6 +349,7 @@ if submit_button:
         with col2:
             st.plotly_chart(female_gauge_chart)
 
+        # Determine the level of bias based on the scores and display a message
         score_diff = male_score - female_score
         if any(word in df['cleaned_word'].tolist() for word in male_explicit_biased_words):
             bias_message_box_class = "bias_message_box bias_message_box_male"
@@ -366,8 +370,11 @@ if submit_button:
             bias_message_box_class = "bias_message_box"
             bias_message = f"Job Description is <b>extremely</b> biased towards {'Male' if score_diff > 0 else 'Female'} Candidates"
 
-        st.markdown(f'<div class="{bias_message_box_class}"><span>{bias_message}</span></div>', unsafe_allow_html=True)
+        # Display the bias message in a styled box
+        st.markdown(
+            f'<div class="{bias_message_box_class}"><span>{bias_message}</span></div>', unsafe_allow_html=True)
 
+        # Display the analyzed job description and highlight gendered terms
         st.markdown("### Analyzed Job Description", unsafe_allow_html=True)
         st.markdown(
             '<style>h3 {margin-top: 10px !important;}</style>', unsafe_allow_html=True)
@@ -379,9 +386,7 @@ if submit_button:
             strongly_feminine_words, strongly_masculine_words,
             weakly_feminine_words, weakly_masculine_words
         )
-        st.markdown(
-            '<style>h3 {margin-top: 10px !important;}</style>', unsafe_allow_html=True)
 
         # Display the highlighted text in a styled box
-        st.markdown(
-            f'<div style="background-color: #f5f5f5; padding: 20px; border: 1px solid #ccc; white-space: pre-wrap; border-radius: 10px; line-height: 1.6;">{highlighted_text}</div>', unsafe_allow_html=True)
+st.markdown(
+    f'<div style="background-color: #f5f5f5; padding: 20px; border: 1px solid #ccc; white-space: pre-wrap; border-radius: 10px; line-height: 1.6;">{highlighted_text}</div>', unsafe_allow_html=True)
