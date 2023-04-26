@@ -1,6 +1,0 @@
-contractions==0.1.73
-nltk==3.8.1
-pandas==1.5.3
-plotly==5.14.1
-beautifulsoup4==4.12.2
-streamlit==1.21.0

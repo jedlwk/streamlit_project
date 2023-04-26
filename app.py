@@ -20,31 +20,27 @@ nltk.download('wordnet')
 female_explicit_biased_words = ['female', 'females', 'woman', 'women', 'she',
                                 'her', 'hers', 'maternity', 'mrs', 'miss']
 
-weakly_feminine_words = ['affectionate', 'approachable', 'attune', 'calming',
-                         'cheer', 'collaborate', 'collaboratively', 'connect',
-                         'cooperate', 'cooperation', 'cooperative', 'dedicated',
-                         'dependable', 'diplomatic', 'expressive', 'heartfelt',
-                         'inclusive', 'interdependent', 'interpersonal', 'listening',
-                         'loyal', 'maternity', 'mediating', 'mindful', 'modest',
-                         'organized']
+weakly_feminine_words = ['affectionate', 'approachable', 'attune', 'calming', 'cheer',
+                            'collaborate', 'collaboratively', 'connect', 'cooperate', 'cooperation',
+                            'cooperative', 'dedicated', 'dependable', 'diplomatic', 'expressive',
+                            'heartfelt', 'inclusive', 'interdependent', 'interpersonal', 'listening',
+                            'loyal', 'maternity', 'mediating', 'mindful', 'modest', 'organized']
 
-strongly_feminine_words = ['attentive', 'caring', 'collaborative', 'community',
-                           'compassion', 'compassionate', 'considerate', 'creative',
-                           'emotional', 'empathetic', 'empathy', 'encouraging',
-                           'enthusiastic', 'friendly', 'gentle', 'harmonious',
-                           'helpful', 'honest', 'humble', 'inspiring', 'kind',
-                           'nurturing', 'patient', 'supportive']
+strongly_feminine_words = ['attentive', 'caring', 'collaborative', 'community', 'compassion',
+                            'compassionate', 'considerate', 'creative', 'emotional', 'empathetic',
+                            'empathy', 'encouraging', 'enthusiastic', 'friendly', 'gentle',
+                            'harmonious', 'helpful', 'honest', 'humble', 'inspiring',
+                            'kind', 'nurturing', 'patient', 'supportive']
 
 male_explicit_biased_words = ['male', 'males', 'man', 'men', 'he',
                               'him', 'his', 'paternity', 'mr']
 
-weakly_masculine_words = ['assertive', 'athletic', 'authoritative', 'autonomy',
-                          'autonomous', 'battle', 'boast', 'commanding', 'courageous',
-                          'defensive', 'determine', 'enterprising', 'exceed',
-                          'exceptional', 'grit', 'headstrong', 'hierarchical',
-                          'individually', 'industrious', 'logical', 'masterful',
-                          'motivate', 'negotiate', 'outgoing', 'outspoken',
-                          'resilient', 'strategic']
+weakly_masculine_words = ['assertive', 'athletic', 'authoritative', 'autonomy', 'autonomous',
+                            'battle', 'boast', 'commanding', 'courageous', 'defensive',
+                            'determine', 'enterprising', 'exceed', 'exceptional', 'grit',
+                            'headstrong', 'hierarchical', 'individually', 'industrious',
+                            'logical', 'masterful', 'motivate', 'negotiate', 'outgoing',
+                            'outspoken', 'resilient', 'strategic']
 
 strongly_masculine_words = ['aggressive', 'ambitious', 'bold', 'challenge', 'competitive',
                             'confident', 'decisive', 'defend', 'direct', 'dominant',
@@ -387,6 +383,9 @@ if submit_button:
             weakly_feminine_words, weakly_masculine_words
         )
 
+        st.markdown(
+            '<style>h3 {margin-top: 20px !important;}</style>', unsafe_allow_html=True)
+        
         # Display the highlighted text in a styled box
-st.markdown(
-    f'<div style="background-color: #f5f5f5; padding: 20px; border: 1px solid #ccc; white-space: pre-wrap; border-radius: 10px; line-height: 1.6;">{highlighted_text}</div>', unsafe_allow_html=True)
+        st.markdown(
+            f'<div style="background-color: #f5f5f5; padding: 20px; border: 1px solid #ccc; white-space: pre-wrap; border-radius: 10px; line-height: 1.6;">{highlighted_text}</div>', unsafe_allow_html=True)
