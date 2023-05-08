@@ -45,7 +45,7 @@ weakly_masculine_words = ['assertive', 'athletic', 'authoritative', 'autonomy', 
 strongly_masculine_words = ['aggressive', 'ambitious', 'bold', 'challenge', 'competitive',
                             'confident', 'decisive', 'defend', 'direct', 'dominant',
                             'disciplined', 'driven', 'energetic', 'fight', 'force',
-                            'focused', 'independent', 'influential', 'lead', 'powerful',
+                            'focused', 'independent', 'influential', 'lead', 'leading', 'powerful',
                             'resolve', 'robust', 'strong']
 
 # Data preprocessing for strong word lists
