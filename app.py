@@ -127,16 +127,16 @@ def highlight_words(df: pd.DataFrame, female_explicit_biased_words: List[str], m
         elif cleaned_word in male_explicit_biased_words:
             highlighted_text.append(
                 f'<mark style="background-color: #4040FF;">{original_word}</mark>')
-        elif further_cleaned_word in strongly_feminine_words:
+        elif (further_cleaned_word in strongly_feminine_words) or (cleaned_word in strongly_feminine_words):
             highlighted_text.append(
                 f'<mark style="background-color: #FFA0A0;">{original_word}</mark>')
-        elif further_cleaned_word in strongly_masculine_words:
+        elif (further_cleaned_word in strongly_masculine_words) or (cleaned_word in strongly_masculine_words):
             highlighted_text.append(
                 f'<mark style="background-color: #A0A0FF;">{original_word}</mark>')
-        elif further_cleaned_word in weakly_feminine_words:
+        elif (further_cleaned_word in weakly_feminine_words) or (cleaned_word in weakly_feminine_words):
             highlighted_text.append(
                 f'<mark style="background-color: #FFD0D0;">{original_word}</mark>')
-        elif further_cleaned_word in weakly_masculine_words:
+        elif (further_cleaned_word in weakly_masculine_words) or (cleaned_word in weakly_masculine_words):
             highlighted_text.append(
                 f'<mark style="background-color: #D0D0FF;">{original_word}</mark>')
         else:
